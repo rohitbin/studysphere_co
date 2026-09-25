@@ -357,14 +357,23 @@ export default function TestQuestionsManager() {
       </div>
 
       {/* Group Questions by Subject */}
-      {(testInfo?.subjects || []).length === 0 ? (
-        <div className="card text-center py-10">
-          <h3 className="text-muted">No subjects added yet.</h3>
-          <p className="text-muted mt-2">Add a subject first before you can add questions.</p>
-          <button className="btn btn-primary mt-4" onClick={() => setIsSubjectModalOpen(true)}>+ Add Subject</button>
-        </div>
-      ) : (
-        (testInfo?.subjects || []).map((subj: string) => {
+      {(() => {
+        const displaySubjects = Array.from(new Set([
+          ...(testInfo?.subjects || []),
+          ...questions.map(q => q.subject)
+        ])).filter(Boolean); // filter out any empty string subjects
+
+        if (displaySubjects.length === 0) {
+          return (
+            <div className="card text-center py-10">
+              <h3 className="text-muted">No subjects added yet.</h3>
+              <p className="text-muted mt-2">Add a subject first before you can add questions.</p>
+              <button className="btn btn-primary mt-4" onClick={() => setIsSubjectModalOpen(true)}>+ Add Subject</button>
+            </div>
+          );
+        }
+
+        return displaySubjects.map((subj: string) => {
           const subjQuestions = questions.filter(q => q.subject === subj);
           return (
             <div key={subj} className="card mb-8">
@@ -439,8 +448,8 @@ export default function TestQuestionsManager() {
               </div>
             </div>
           );
-        })
-      )}
+        });
+      })()}
 
       {/* Add Subject Modal */}
       {isSubjectModalOpen && (
