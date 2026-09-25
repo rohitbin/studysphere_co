@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ReactNode } from "react";
+import LogoutButton from "@/components/LogoutButton";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
@@ -23,6 +24,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </li>
           <li>
             <Link href="/admin/access" className="admin-nav-item">Access Management</Link>
+          </li>
+          <li style={{ marginTop: 'auto', paddingTop: '2rem' }}>
+            <LogoutButton />
           </li>
         </ul>
       </aside>
