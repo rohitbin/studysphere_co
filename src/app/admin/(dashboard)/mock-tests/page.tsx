@@ -57,12 +57,19 @@ export default function AdminMockTests() {
 
   // Helper to save to API
   const saveToDB = async (updatedTests: MockTest[]) => {
-    setTests(updatedTests);
-    await fetch('/api/tests', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tests: updatedTests })
-    });
+    try {
+      const res = await fetch('/api/tests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tests: updatedTests })
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || "Failed to save mock test");
+      setTests(updatedTests);
+    } catch (error: any) {
+      console.error("Failed to save mock test:", error);
+      alert(error.message || "Failed to save mock test to database.");
+    }
   };
 
   const handleOpenModal = (test?: MockTest) => {

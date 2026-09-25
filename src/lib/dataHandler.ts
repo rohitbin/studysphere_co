@@ -8,10 +8,12 @@ export const getDbData = async () => {
 
 export const saveDbData = async (data: any) => {
   if (data.tests && data.tests.length > 0) {
-    await supabase.from('tests').upsert(data.tests);
+    const { error } = await supabase.from('tests').upsert(data.tests);
+    if (error) throw error;
   }
   if (data.results && data.results.length > 0) {
-    await supabase.from('results').upsert(data.results);
+    const { error } = await supabase.from('results').upsert(data.results);
+    if (error) throw error;
   }
 };
 
@@ -22,6 +24,7 @@ export const getQuestionsData = async () => {
 
 export const saveQuestionsData = async (data: any) => {
   if (data.questions && data.questions.length > 0) {
-    await supabase.from('questions').upsert(data.questions);
+    const { error } = await supabase.from('questions').upsert(data.questions);
+    if (error) throw error;
   }
 };

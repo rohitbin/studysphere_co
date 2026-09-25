@@ -66,22 +66,22 @@ export default function TestQuestionsManager() {
   }, [testId]);
 
   const saveToDB = async (updatedFilteredQuestions: Question[]) => {
-    setQuestions(updatedFilteredQuestions);
-    
-    // We need to fetch the FULL DB, replace the ones for this test, and save back.
-    const res = await fetch('/api/questions');
-    const qData = await res.json();
-    const allQuestions: Question[] = qData.questions || [];
-    
-    // Remove old questions for this test and append the new ones
-    const otherQuestions = allQuestions.filter(q => q.mockTestId !== testId);
-    const newGlobalState = [...otherQuestions, ...updatedFilteredQuestions];
-
-    await fetch('/api/questions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ questions: newGlobalState })
-    });
+    try {
+      const res = await fetch('/api/questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questions: updatedFilteredQuestions })
+      });
+      
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || "Failed to save questions");
+      
+      // Update UI only if DB save succeeded
+      setQuestions(updatedFilteredQuestions);
+    } catch (error: any) {
+      console.error("Failed to save to DB:", error);
+      alert(error.message || "Failed to upload questions to database.");
+    }
   };
 
   const handleAddSubject = async (e: React.FormEvent) => {
