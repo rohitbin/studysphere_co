@@ -3,8 +3,17 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
+  const path = request.nextUrl.pathname;
 
-  // Check if the user already has a device/student ID cookie
+  // 1. Admin Route Protection
+  if (path.startsWith('/admin') && !path.startsWith('/admin/login')) {
+    const adminToken = request.cookies.get('admin_token')?.value;
+    if (!adminToken) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+  }
+
+  // 2. Check if the user already has a device/student ID cookie
   let studentId = request.cookies.get('student_id')?.value;
 
   // If not, generate a random one and set it

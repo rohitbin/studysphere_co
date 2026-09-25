@@ -9,17 +9,30 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError("");
     
-    // For demonstration purposes, we will accept admin@gmail.com / alpzazzaz
-    // Or any login for now since there's no DB connected yet.
-    if (email === "admin@gmail.com" && password === "alpzazzaz") {
-      // In a real application, we would call an API route here that issues a secure HttpOnly cookie or JWT.
-      router.push("/admin/mock-tests");
-    } else {
-      setError("Invalid email or password. Please use admin@gmail.com / alpzazzaz");
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        router.push("/admin/dashboard");
+      } else {
+        setError(data.error || "Invalid credentials");
+      }
+    } catch (err) {
+      setError("An error occurred during login.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
