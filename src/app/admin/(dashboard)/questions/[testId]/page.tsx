@@ -93,21 +93,22 @@ export default function TestQuestionsManager() {
       subjects: [...(testInfo.subjects || []), newSubjectName.trim()]
     };
     
-    setTestInfo(updatedTestInfo);
-    setIsSubjectModalOpen(false);
-    setNewSubjectName("");
-
-    // Save to DB
-    const res = await fetch('/api/tests');
-    const tData = await res.json();
-    const allTests = tData.tests || [];
-    const updatedTests = allTests.map((t: any) => t.id === testId ? updatedTestInfo : t);
-    
-    await fetch('/api/tests', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tests: updatedTests })
-    });
+    try {
+      const res = await fetch('/api/tests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tests: [updatedTestInfo] })
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || "Failed to save subject");
+      
+      setTestInfo(updatedTestInfo);
+      setIsSubjectModalOpen(false);
+      setNewSubjectName("");
+    } catch (error: any) {
+      console.error("Failed to add subject", error);
+      alert(error.message || "Failed to save subject to database.");
+    }
   };
 
   const handleDeleteSubject = async (subj: string) => {
@@ -116,18 +117,21 @@ export default function TestQuestionsManager() {
     // 1. Remove subject from testInfo
     const updatedSubjects = (testInfo.subjects || []).filter((s: string) => s !== subj);
     const updatedTestInfo = { ...testInfo, subjects: updatedSubjects };
-    setTestInfo(updatedTestInfo);
-
-    const res = await fetch('/api/tests');
-    const tData = await res.json();
-    const allTests = tData.tests || [];
-    const updatedTests = allTests.map((t: any) => t.id === testId ? updatedTestInfo : t);
-    
-    await fetch('/api/tests', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tests: updatedTests })
-    });
+    try {
+      const res = await fetch('/api/tests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tests: [updatedTestInfo] })
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || "Failed to delete subject");
+      
+      setTestInfo(updatedTestInfo);
+    } catch (error: any) {
+      console.error("Failed to update test after deleting subject", error);
+      alert(error.message || "Failed to update test in database.");
+      return; // Stop execution to prevent deleting questions if the test update failed
+    }
 
     // 2. Remove all questions under this subject
     const idsToDelete = questions.filter(q => q.subject === subj).map(q => q.id);
