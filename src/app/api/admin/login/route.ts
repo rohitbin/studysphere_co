@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
@@ -10,13 +10,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Email and password are required" }, { status: 400 });
     }
 
+    // Create an admin client to bypass RLS (Row Level Security)
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    // Fallback to anon key if service role is not provided, though service role is required for RLS tables
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
+
     // Query the custom admins table
-    const { data: admin, error } = await supabase
+    const { data: admin, error } = await supabaseAdmin
       .from('admins')
       .select('*')
       .eq('email', email)
       .eq('password', password)
-      .single();
+      .maybeSingle();
 
     if (error || !admin) {
       return NextResponse.json({ success: false, error: "Invalid email or password" }, { status: 401 });

@@ -130,8 +130,15 @@ export default function TestQuestionsManager() {
     });
 
     // 2. Remove all questions under this subject
-    const remainingQuestions = questions.filter(q => q.subject !== subj);
-    await saveToDB(remainingQuestions);
+    const idsToDelete = questions.filter(q => q.subject === subj).map(q => q.id);
+    if (idsToDelete.length > 0) {
+      await fetch('/api/questions', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: idsToDelete })
+      });
+      setQuestions(questions.filter(q => q.subject !== subj));
+    }
   };
 
   const handleOpenModal = (subjectName: string, q?: Question) => {
@@ -172,9 +179,18 @@ export default function TestQuestionsManager() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (questionToDelete) {
-      saveToDB(questions.filter(q => q.id !== questionToDelete));
+      try {
+        await fetch('/api/questions', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids: [questionToDelete] })
+        });
+        setQuestions(questions.filter(q => q.id !== questionToDelete));
+      } catch (error) {
+        console.error("Failed to delete question", error);
+      }
     }
     setIsDeleteModalOpen(false);
     setQuestionToDelete(null);
@@ -198,11 +214,22 @@ export default function TestQuestionsManager() {
     setSelectedQuestions(newSet);
   };
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (selectedQuestions.size === 0) return;
     if (!confirm(`Are you sure you want to delete ${selectedQuestions.size} selected questions? This cannot be undone.`)) return;
-    saveToDB(questions.filter(q => !selectedQuestions.has(q.id)));
-    setSelectedQuestions(new Set());
+    
+    const idsToDelete = Array.from(selectedQuestions);
+    try {
+      await fetch('/api/questions', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: idsToDelete })
+      });
+      setQuestions(questions.filter(q => !selectedQuestions.has(q.id)));
+      setSelectedQuestions(new Set());
+    } catch (error) {
+      console.error("Failed to bulk delete", error);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {

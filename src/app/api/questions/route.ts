@@ -19,3 +19,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: "Failed to update" }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const { ids } = await request.json();
+    if (ids && ids.length > 0) {
+      const { supabase } = await import('@/lib/supabase');
+      await supabase.from('questions').delete().in('id', ids);
+    }
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: "Failed to delete" }, { status: 500 });
+  }
+}

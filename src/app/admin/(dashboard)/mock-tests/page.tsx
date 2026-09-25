@@ -117,9 +117,18 @@ export default function AdminMockTests() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (testToDelete) {
-      saveToDB(tests.filter(t => t.id !== testToDelete));
+      try {
+        await fetch('/api/tests', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: testToDelete })
+        });
+        setTests(tests.filter(t => t.id !== testToDelete));
+      } catch (error) {
+        console.error("Failed to delete test", error);
+      }
     }
     setIsDeleteModalOpen(false);
     setTestToDelete(null);
