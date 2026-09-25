@@ -132,12 +132,19 @@ export default function TestQuestionsManager() {
     // 2. Remove all questions under this subject
     const idsToDelete = questions.filter(q => q.subject === subj).map(q => q.id);
     if (idsToDelete.length > 0) {
-      await fetch('/api/questions', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids: idsToDelete })
-      });
-      setQuestions(questions.filter(q => q.subject !== subj));
+      try {
+        const res = await fetch('/api/questions', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ids: idsToDelete })
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error || "Failed to delete questions");
+        setQuestions(questions.filter(q => q.subject !== subj));
+      } catch (error: any) {
+        console.error("Failed to delete questions", error);
+        alert(error.message || "Failed to delete questions from database.");
+      }
     }
   };
 
@@ -182,14 +189,17 @@ export default function TestQuestionsManager() {
   const handleDelete = async () => {
     if (questionToDelete) {
       try {
-        await fetch('/api/questions', {
+        const res = await fetch('/api/questions', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ids: [questionToDelete] })
         });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error || "Failed to delete question");
         setQuestions(questions.filter(q => q.id !== questionToDelete));
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to delete question", error);
+        alert(error.message || "Failed to delete question from database.");
       }
     }
     setIsDeleteModalOpen(false);
@@ -220,15 +230,18 @@ export default function TestQuestionsManager() {
     
     const idsToDelete = Array.from(selectedQuestions);
     try {
-      await fetch('/api/questions', {
+      const res = await fetch('/api/questions', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids: idsToDelete })
       });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || "Failed to bulk delete questions");
       setQuestions(questions.filter(q => !selectedQuestions.has(q.id)));
       setSelectedQuestions(new Set());
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to bulk delete", error);
+      alert(error.message || "Failed to bulk delete questions from database.");
     }
   };
 

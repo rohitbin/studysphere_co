@@ -25,9 +25,16 @@ export async function DELETE(request: Request) {
   try {
     const { id } = await request.json();
     const { supabase } = await import('@/lib/supabase');
-    await supabase.from('tests').delete().eq('id', id);
+    
+    const { error } = await supabase.from('tests').delete().eq('id', id);
+    if (error) throw error;
+
+    // Delete associated questions
+    await supabase.from('questions').delete().eq('mockTestId', id);
+    
     return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json({ success: false, error: "Failed to delete" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Delete Error:", error);
+    return NextResponse.json({ success: false, error: error.message || "Failed to delete" }, { status: 500 });
   }
 }
