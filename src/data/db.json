@@ -1,0 +1,58 @@
+{
+  "tests": [
+    {
+      "status": "Published",
+      "negativeMarking": "0.34",
+      "price": "20",
+      "title": "UPSC Prelims GS Mock Test - 01",
+      "exam": "UPSC CSE",
+      "description": "Full length mock test.",
+      "duration": "1",
+      "totalMarks": "200",
+      "questionCount": "100",
+      "id": "MT001",
+      "accessId": "bnm",
+      "accessPassword": "bnm",
+      "subjects": [
+        "History",
+        "Maths"
+      ],
+      "coverImage": "/uploads/1790309461546-ChatGPT_Image_Sep_24__2026__07_48_36_PM.png",
+      "qrCode": "/uploads/1790310093880-WhatsApp_Image_2026-09-25_at_9.50.53_AM.jpeg",
+      "upiId": "9415590@upi",
+      "validUntil": "2027-04-02"
+    },
+    {
+      "status": "Published",
+      "negativeMarking": "0.34",
+      "price": 0,
+      "title": "UPSC Prelims GS",
+      "exam": "UPSC CSE",
+      "description": "UPSC Prelims GS",
+      "duration": "10",
+      "totalMarks": "10",
+      "questionCount": "10",
+      "accessId": "UPSC24",
+      "accessPassword": "0000",
+      "id": "MT222",
+      "coverImage": "/uploads/1790318362095-ChatGPT_Image_Sep_24__2026__07_48_36_PM.png",
+      "availableFrom": "2026-12-03"
+    },
+    {
+      "status": "Published",
+      "negativeMarking": "0",
+      "price": 0,
+      "title": "bbjbk",
+      "exam": "jhhhb",
+      "description": "kjbbjj",
+      "duration": "9",
+      "totalMarks": "88",
+      "questionCount": "90",
+      "accessId": "vbnm",
+      "accessPassword": "vbnm",
+      "coverImage": "/uploads/1790318373812-ChatGPT_Image_Sep_24__2026__07_48_36_PM.png",
+      "qrCode": "/uploads/1790318123316-WhatsApp_Image_2026-09-25_at_9.50.53_AM.jpeg",
+      "id": "MT459"
+    }
+  ]
+}
