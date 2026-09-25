@@ -38,7 +38,52 @@ async function getActiveTests(): Promise<MockTest[]> {
   }
 }
 
-export default async function MockTestsPage() {
+import type { Metadata } from 'next';
+
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const resolvedSearchParams = await searchParams;
+  const testId = resolvedSearchParams.testId as string;
+  
+  if (testId) {
+    const activeTests = await getActiveTests();
+    const test = activeTests.find(t => t.id === testId);
+    
+    if (test) {
+      // Vercel sets VERCEL_URL automatically. Fallback to localhost.
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 
+                      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+      
+      const imageUrl = test.coverImage ? `${baseUrl}/api/og-image?testId=${test.id}` : '';
+
+      return {
+        title: `${test.title} | StudySphere_co Mock Test`,
+        description: test.description,
+        openGraph: {
+          title: test.title,
+          description: test.description,
+          images: imageUrl ? [imageUrl] : [],
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title: test.title,
+          description: test.description,
+          images: imageUrl ? [imageUrl] : [],
+        }
+      };
+    }
+  }
+
+  return {
+    title: 'Available Mock Tests | StudySphere_co',
+    description: 'Practice and track your progress with our premium tests.',
+  };
+}
+
+export default async function MockTestsPage({ searchParams }: Props) {
   const activeTests = await getActiveTests();
 
   return (
