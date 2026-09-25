@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDbData, saveDbData } from '@/lib/dataHandler';
-export const dynamic = 'force-dynamic';
+export const revalidate = 5;
 
 export async function GET() {
   try {
