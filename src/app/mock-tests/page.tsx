@@ -4,7 +4,7 @@ import MockTestList from "@/components/MockTestList";
 
 
 // Types
-export const revalidate = 5;
+export const dynamic = 'force-dynamic';
 type TestStatus = "Draft" | "Published" | "Archived";
 
 interface MockTest {
