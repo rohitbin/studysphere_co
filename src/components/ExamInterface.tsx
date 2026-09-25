@@ -26,12 +26,15 @@ export default function ExamInterface({ testInfo, questions, studentId }: { test
     return map;
   });
 
+  const [hasStarted, setHasStarted] = useState(false);
+
   // Timer logic
   const [timeLeft, setTimeLeft] = useState(testInfo.duration * 60);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [examResult, setExamResult] = useState<any>(null);
   
   useEffect(() => {
+    if (!hasStarted) return;
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
@@ -42,16 +45,16 @@ export default function ExamInterface({ testInfo, questions, studentId }: { test
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [hasStarted]);
 
   // Auto-submit when time reaches 0
   const hasAutoSubmitted = useRef(false);
   useEffect(() => {
-    if (timeLeft <= 0 && !hasAutoSubmitted.current) {
+    if (hasStarted && timeLeft <= 0 && !hasAutoSubmitted.current) {
       hasAutoSubmitted.current = true;
       submitExam();
     }
-  }, [timeLeft]);
+  }, [timeLeft, hasStarted]);
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
@@ -165,6 +168,44 @@ export default function ExamInterface({ testInfo, questions, studentId }: { test
     marked: Object.values(statusMap).filter(s => s === 'marked').length,
     unvisited: Object.values(statusMap).filter(s => s === 'unvisited').length,
   };
+
+  if (!hasStarted) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: '#f4f7f6', padding: '2rem' }}>
+        <div style={{ backgroundColor: 'white', borderRadius: 'var(--radius-lg)', padding: '3rem', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', maxWidth: '800px', width: '100%' }}>
+          <h1 style={{ fontSize: '2rem', marginBottom: '1rem', color: 'var(--primary-navy)' }}>{testInfo.title}</h1>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', marginBottom: '2rem', color: 'var(--text-muted)', borderBottom: '1px solid var(--accent-gray)', paddingBottom: '2rem' }}>
+            <span><strong>Duration:</strong> {testInfo.duration} Minutes</span>
+            <span><strong>Total Marks:</strong> {testInfo.totalMarks}</span>
+            <span><strong>Questions:</strong> {questions.length}</span>
+            <span><strong>Negative Marking:</strong> {testInfo.negativeMarking}</span>
+          </div>
+
+          <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--primary-navy)' }}>General Instructions</h3>
+          <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', lineHeight: '1.8', color: 'var(--text-muted)', marginBottom: '3rem', fontSize: '1rem' }}>
+            <li>The clock will be set at the server. The countdown timer in the top right corner of the screen will display the remaining time available for you to complete the examination.</li>
+            <li>When the timer reaches zero, the examination will end automatically. You will not be required to end or submit your examination.</li>
+            <li>You can navigate between different subjects using the tabs at the top of the exam screen.</li>
+            <li>Use the <strong>Save & Next</strong> button to save your answer for the current question and then go to the next question.</li>
+            <li>Use the <strong>Mark for Review & Next</strong> button if you want to review the question later.</li>
+            <li>Click on the <strong>Clear Response</strong> button to deselect your chosen answer.</li>
+          </ul>
+
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <button 
+              className="btn btn-primary" 
+              style={{ fontSize: '1.2rem', padding: '1rem 4rem', borderRadius: '50px', boxShadow: '0 8px 20px rgba(26, 115, 232, 0.3)', transition: 'transform 0.2s' }}
+              onClick={() => setHasStarted(true)}
+              onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            >
+              Start Exam
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

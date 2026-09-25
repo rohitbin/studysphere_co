@@ -2,6 +2,7 @@ import { getDbData } from "@/lib/dataHandler";
 import React, { Suspense } from "react";
 import MockTestList from "@/components/MockTestList";
 
+
 // Types
 export const revalidate = 5;
 type TestStatus = "Draft" | "Published" | "Archived";

@@ -28,8 +28,10 @@ export default function MockTestList({ tests }: { tests: MockTest[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedTest, setSelectedTest] = useState<MockTest | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     const testId = searchParams.get('testId');
     if (testId) {
       const test = tests.find(t => t.id === testId);
@@ -43,6 +45,9 @@ export default function MockTestList({ tests }: { tests: MockTest[] }) {
   const [accessId, setAccessId] = useState("");
   const [accessPassword, setAccessPassword] = useState("");
   const [accessError, setAccessError] = useState("");
+
+  if (!isMounted) return null;
+
 
   const handleOpenModal = (test: MockTest) => {
     setSelectedTest(test);
