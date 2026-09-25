@@ -3,6 +3,7 @@ import React, { Suspense } from "react";
 import MockTestList from "@/components/MockTestList";
 
 // Types
+export const dynamic = 'force-dynamic';
 type TestStatus = "Draft" | "Published" | "Archived";
 
 interface MockTest {
