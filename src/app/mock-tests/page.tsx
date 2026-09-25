@@ -57,7 +57,16 @@ export async function generateMetadata(props: { searchParams?: Promise<{ [key: s
         openGraph: {
           title: test.title,
           description: test.description || `Take the ${test.title} mock test.`,
-          images: test.coverImage ? [{ url: test.coverImage }] : [],
+          type: 'website',
+          siteName: 'StudySphere_co',
+          images: test.coverImage ? [
+            {
+              url: test.coverImage,
+              width: 1200,
+              height: 630,
+              alt: test.title,
+            }
+          ] : [],
         },
         twitter: {
           card: 'summary_large_image',

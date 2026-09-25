@@ -10,6 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://studysphere.co'),
   title: "StudySphere_co Mock Test Platform",
   description: "UPSC & Competitive Exam Mock Tests platform. Practice with exam-oriented mock tests and analyze your preparation.",
 };
